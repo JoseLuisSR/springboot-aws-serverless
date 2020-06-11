@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  Master stack to create nested stack with resources to deploy serverless application.
+Parameters:
+  LambdaFunctionName:
+    ConstraintDescription: must contain only alphanumeric characters.
+    Default: LambdaFunction
+    Description: The name of the Lambda function.
+    MaxLength: 64
+    MinLength: 1
+    Type: String
+  LambdaHandler:
+    Default: package.class-name::handler
+    Description: Package, class and the name of the method within your code that Lambda calls to execute your function.
+    MaxLength: 128
+    MinLength: 1
+    Type: String
+  LambdaRuntime:
+    AllowedValues:
+      - java8
+      - java11
+    Default: java8
+    Description: Lambda runtime to deploy application.
+    Type: String
+  LambdaCodeS3Bucket:
+    Default: https://s3.amazonaws.com/mybucket/path/to/
+    Description: The deployment package for a Lambda function. Location of an object in Amazon S3.
+    Type: String
+  LambdaCodeS3Key:
+    Default: Object.zip
+    Description: The deployment package for a Lambda function. Name of the object in Amazon S3.
+    Type: String
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      Handler: !Ref LambdaHandler
+      Role: !GetAtt LambdaRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaCodeS3Bucket
+        S3Key: !Ref LambdaCodeS3Key
+      Runtime: !Ref LambdaRuntime
+      MemorySize: 512
+      Timeout: 600
+    DependsOn: LambdaPolicy
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /service-role/
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+  LambdaPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: PolicyRole
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+            Resource: !GetAtt LambdaLogGroup.Arn
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !GetAtt LambdaLogGroup.Arn
+      Roles:
+        - Ref: LambdaRole

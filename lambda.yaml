@@ -16,10 +16,24 @@ Parameters:
     MinLength: 1
     Type: String
   LambdaRuntime:
+    Default: java8
     AllowedValues:
       - java8
       - java11
-    Default: java8
+      - dotnetcore2.1
+      - dotnetcore3.1
+      - go1.x
+      - java11
+      - java8
+      - nodejs10.x
+      - nodejs12.x
+      - provided
+      - python2.7
+      - python3.6
+      - python3.7
+      - python3.8
+      - ruby2.5
+      - ruby2.7
     Description: Lambda runtime to deploy application.
     Type: String
   LambdaCodeS3Bucket:
@@ -62,16 +76,15 @@ Resources:
     Properties:
       RetentionInDays: 1
   LambdaPolicy:
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      PolicyName: PolicyRole
       PolicyDocument:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action:
               - logs:CreateLogGroup
-            Resource: !GetAtt LambdaLogGroup.Arn
+            Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
           - Effect: Allow
             Action:
               - logs:CreateLogStream

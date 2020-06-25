@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+Resources:
+  APIGatewayRest:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Join ["",[!ImportValue LambdaFunctionName, "APIGateway"]]
+
+  APIGatewayResourceCustomer:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGatewayRest
+      ParentId: !GetAtt APIGatewayRest.RootResourceId
+      PathPart: customer
+
+  APIGatewayResourceCustomerKey:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGatewayRest
+      ParentId: !Ref APIGatewayResourceCustomer
+      PathPart: {key}
+
+  APIGatewayCustomerKeyMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub ${AWS::AccountId}
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      ResourceId: !Ref APIGatewayResourceCustomerKey
+      RestApiId: !Ref APIGatewayRest
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: GET
+        Uri: !Join ["",["arn:aws:apigateway:",!Ref AWS::Region, ":lambda:path/2015-03-31/functions/", !ImportValue LambdaFunctionArn,"/invocations"]]
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates: {"application/json":""}
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref APIGatewayRest
+      Description: Lambda API Delployment
+    DependsOn: APIGatewayCustomerKeyMethod
+
+  APIGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref APIGatewayDeployment
+      RestApiId: !Ref APIGatewayRest
+      StageName: ist
+      Description: API Gateway IST stage
+    DependsOn: APIGatewayDeployment
+
+  APIGatewayRestPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/*"
+      Action: lambda:InvokeFunction
+      FunctionName: !ImportValue LambdaFunctionArn
+    DependsOn: APIGatewayRest

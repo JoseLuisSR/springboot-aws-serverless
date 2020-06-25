@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Lambda function parameters
+        Parameters:
+          - LambdaFunctionName
+          - LambdaHandler
+          - LambdaRuntime
+          - LambdaCodeS3Bucket
+          - LambdaCodeS3Key
+      -
+        Label:
+          default: Nested Stack
+        Parameters:
+          - TemplateURLambda
+          - TemplateURLApiGateway
+
+Parameters:
+  TemplateURLambda:
+    Default: https://s3.amazonaws.com/mybucket/path/to/lambda.yml
+    Description: The lambda function stack template. Location of an object in Amazon S3.
+    Type: String
+
+  TemplateURLApiGateway:
+    Default: https://s3.amazonaws.com/mybucket/path/to/apigateway.yml
+    Description: The API Gateway stack template. Location of an object in Amazon S3.
+    Type: String
+
+  LambdaFunctionName:
+    ConstraintDescription: must contain only alphanumeric characters.
+    Default: CustomerServerless
+    Description: The name of the Lambda function.
+    MaxLength: 64
+    MinLength: 1
+    Type: String
+
+  LambdaHandler:
+    Default: com.aws.lambda.customer.StreamLambdaHandler::handleRequest
+    Description: Package, class and the name of the method within your code that Lambda calls to execute your function.
+    MaxLength: 128
+    MinLength: 1
+    Type: String
+
+  LambdaRuntime:
+    Default: java8
+    AllowedValues:
+      - java8
+      - java11
+      - dotnetcore2.1
+      - dotnetcore3.1
+      - go1.x
+      - java11
+      - java8
+      - nodejs10.x
+      - nodejs12.x
+      - provided
+      - python2.7
+      - python3.6
+      - python3.7
+      - python3.8
+      - ruby2.5
+      - ruby2.7
+    Description: Lambda runtime to deploy application.
+    Type: String
+
+  LambdaCodeS3Bucket:
+    Default: mybucket
+    Description: The deployment package for a Lambda function. Location of an object in Amazon S3.
+    Type: String
+
+  LambdaCodeS3Key:
+    Default: Customer-0.0.1.zip
+    Description: The deployment package for a Lambda function. Name of the object in Amazon S3.
+    Type: String
+
+Resources:
+  lambda:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Ref TemplateURLambda
+      Parameters:
+        LambdaFunctionName: !Ref LambdaFunctionName
+        LambdaHandler: !Ref LambdaHandler
+        LambdaRuntime: !Ref LambdaRuntime
+        LambdaCodeS3Bucket: !Ref LambdaCodeS3Bucket
+        LambdaCodeS3Key: !Ref LambdaCodeS3Key

@@ -2,15 +2,17 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description:
   Master stack to create nested stack with resources to deploy serverless application.
 Parameters:
+
   LambdaFunctionName:
     ConstraintDescription: must contain only alphanumeric characters.
-    Default: LambdaFunction
+    Default: CustomerServerless
     Description: The name of the Lambda function.
     MaxLength: 64
     MinLength: 1
     Type: String
+
   LambdaHandler:
-    Default: package.class-name::handler
+    Default: com.aws.lambda.customer.StreamLambdaHandler::handleRequest
     Description: Package, class and the name of the method within your code that Lambda calls to execute your function.
     MaxLength: 128
     MinLength: 1
@@ -36,15 +38,19 @@ Parameters:
       - ruby2.7
     Description: Lambda runtime to deploy application.
     Type: String
+
   LambdaCodeS3Bucket:
-    Default: https://s3.amazonaws.com/mybucket/path/to/
+    Default: mybucket
     Description: The deployment package for a Lambda function. Location of an object in Amazon S3.
     Type: String
+
   LambdaCodeS3Key:
-    Default: Object.zip
+    Default: Customer-0.0.1.zip
     Description: The deployment package for a Lambda function. Name of the object in Amazon S3.
     Type: String
+
 Resources:
+
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -58,6 +64,7 @@ Resources:
       MemorySize: 512
       Timeout: 600
     DependsOn: LambdaPolicy
+
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -71,10 +78,12 @@ Resources:
             Action:
               - sts:AssumeRole
       Path: /service-role/
+
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 1
+
   LambdaPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -92,3 +101,15 @@ Resources:
             Resource: !GetAtt LambdaLogGroup.Arn
       Roles:
         - Ref: LambdaRole
+
+Outputs:
+  LambdaFunctionArn:
+    Description: Lambda function Arn
+    Value: !GetAtt LambdaFunction.Arn
+    Export:
+      Name: LambdaFunctionArn
+  LambdaFunctionName:
+    Description: Lambda function name
+    Value: !Ref LambdaFunction
+    Export:
+      Name: LambdaFunctionName

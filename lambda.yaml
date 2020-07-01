@@ -1,6 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description:
-  Master stack to create nested stack with resources to deploy serverless application.
+Description: Stack to deploy lambda function through infrastructure as code.
 Parameters:
 
   LambdaFunctionName:
@@ -17,6 +16,7 @@ Parameters:
     MaxLength: 128
     MinLength: 1
     Type: String
+
   LambdaRuntime:
     Default: java8
     AllowedValues:

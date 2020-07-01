@@ -1,10 +1,28 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description:
+Description: Stack to deploy API Gateway through infrastructure as code.
+Parameters:
+  LambdaFunctionName:
+    ConstraintDescription: must contain only alphanumeric characters.
+    Default: CustomerServerless
+    Description: The name of the Lambda function.
+    MaxLength: 64
+    MinLength: 1
+    Type: String
+
+  LambdaFunctionArn:
+    Description: Lambda function Arn.
+    Type: String
+
 Resources:
+
   APIGatewayRest:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Join ["",[!ImportValue LambdaFunctionName, "APIGateway"]]
+      Name: !Join ["",[!Ref LambdaFunctionName, "APIGateway"]]
+      Description: !Join ["",["API Gateway to Lambda Function ",!Ref LambdaFunctionName]]
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
 
   APIGatewayResourceCustomer:
     Type: AWS::ApiGateway::Resource
@@ -18,7 +36,7 @@ Resources:
     Properties:
       RestApiId: !Ref APIGatewayRest
       ParentId: !Ref APIGatewayResourceCustomer
-      PathPart: {key}
+      PathPart: "{key}"
 
   APIGatewayCustomerKeyMethod:
     Type: AWS::ApiGateway::Method
@@ -30,15 +48,22 @@ Resources:
       ResourceId: !Ref APIGatewayResourceCustomerKey
       RestApiId: !Ref APIGatewayRest
       Integration:
-        Type: AWS
-        IntegrationHttpMethod: GET
-        Uri: !Join ["",["arn:aws:apigateway:",!Ref AWS::Region, ":lambda:path/2015-03-31/functions/", !ImportValue LambdaFunctionArn,"/invocations"]]
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ["",["arn:aws:apigateway:",!Ref "AWS::Region", ":lambda:path/2015-03-31/functions/", !Ref LambdaFunctionArn,"/invocations"]]
         IntegrationResponses:
           - StatusCode: 200
             ResponseTemplates: {"application/json":""}
       MethodResponses:
         - StatusCode: 200
           ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref APIGatewayRest
+      Schema: {}
 
   APIGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
@@ -59,8 +84,8 @@ Resources:
   APIGatewayRestPermission:
     Type: AWS::Lambda::Permission
     Properties:
+      Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/*"
-      Action: lambda:InvokeFunction
-      FunctionName: !ImportValue LambdaFunctionArn
+      FunctionName: !Ref LambdaFunctionArn
     DependsOn: APIGatewayRest

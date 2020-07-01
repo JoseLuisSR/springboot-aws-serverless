@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Description: Master stack to create nested stack with resources to deploy serverless application.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -87,3 +88,12 @@ Resources:
         LambdaRuntime: !Ref LambdaRuntime
         LambdaCodeS3Bucket: !Ref LambdaCodeS3Bucket
         LambdaCodeS3Key: !Ref LambdaCodeS3Key
+
+  apigateway:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Ref TemplateURLApiGateway
+      Parameters:
+        LambdaFunctionName: !Ref LambdaFunctionName
+        LambdaFunctionArn: !GetAtt lambda.Outputs.LambdaFunctionArn
+    DependsOn: lambda

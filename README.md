@@ -80,7 +80,7 @@ services using JWT with oauth2.0, define limits like TPS and monitoring the requ
 
 Our API Gateway stack template has the code to create REST API and integrate with Lambda Function. Below you can find a mind map with the resources and precedence needed to create API Gateway with Cloudformation.
 
-![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/api-gateway-mind-map.png?raw=true)
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/api-gateway-mind-map.jpg?raw=true)
 
 ### AWS Lambda function
 

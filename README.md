@@ -72,7 +72,7 @@ In this repository you can find master stack (root) and API Gateway and Lambda f
 ### AWS API Gateway
 
 It is serverless service and is integration middleware between clients and AWS services. API Gateway knows the location of the end-points, can control the access to the 
-services using JWT with oauth2.0, define limits like TPS and monitoring the requests to services. 
+services using JWT with oauth2.0, define limits like TPS, load balancing and monitoring the requests to services. 
 
 ![Screenshot](https://d1.awsstatic.com/serverless/New-API-GW-Diagram.c9fc9835d2a9aa00ef90d0ddc4c6402a2536de0d.png)
 
@@ -82,10 +82,40 @@ Our API Gateway stack template has the code to create REST API and integrate wit
 
 ![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/api-gateway-mind-map.jpg?raw=true)
 
+Each node of the mind map is [AWS resource](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html) and each AWS service is a set of AWS resources, for AWS API Gateway 
+that expose REST API and integrate with Lambda Function we need at less the below resources:
+
+* [AWS::ApiGateway::RestApi](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html)
+* [AWS::ApiGateway::Resource](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-resource.html)
+* [AWS::ApiGateway::Method](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-method.html)
+* [AWS::ApiGateway::Deployment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-deployment.html)
+* [AWS::ApiGateway::Stage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html)
+* [AWS::Lambda::Permission](https://docs.aws.amazon.com/lambda/latest/dg/lambda-permissions.html)   
+
+One of the clues to know which are the AWS resources necessary to create one AWS service through Cloudformation (IaC) is first create the service from AWS Web Console and play attention to each screen and data 
+needed in that process, most of the times you can find a relation between the screens and AWS Resources and the data with the properties of each resource.
+
+One of the preconditions to create AWS API Gateway is created AWS Lambda function first, so we see a precedence between theses services. You can find the precedence in master stack template (master.yaml) and 
+also some of the resources of AWS API Gateway need the ARN of Lambda Function to set up. Check API Gateway stack template (apigateway.yaml) to see all the details.
+
 ### AWS Lambda function
 
+Is a set of infrastructure and platforms dynamic services to deploy and run software component with the IT resources needed, also guarantee the availability and scalability when high of request is incoming to the component.
 
-This is a project to build Spring Boot application and deploy it on AWS Lambda function  using 
-Infrastructure as Code (IaC) with CloudFormation.
+The infrastructure, resources provisioning, availability and scalability are responsibility of AWS that analyze the software component behavior about machine resources, execution time, throughput and more to set up the 
+resources that the component needs to process incoming requests in along the day.
+
+Lambda function stack template has the code to deploy and execute Spring Boot application with Java 8. Below you can find a mind map with the parameters and resources needed to create Lambda Function with Cloudformation.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/lambda-function-mind-map.jpg?raw=true)
+
+Below are the AWS resources needed to create AWS Lambda Function and set up Spring Boot application:
+
+* [AWS::Lambda::Function](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html)
+* [AWS::IAM::Role](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html)
+* [AWS::Logs::LogGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html)
+* [AWS::IAM::ManagedPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-managedpolicy.html) 
+
+
 
 Working in progress .....

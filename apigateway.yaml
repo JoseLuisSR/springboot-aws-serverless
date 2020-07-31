@@ -31,6 +31,47 @@ Resources:
       ParentId: !GetAtt APIGatewayRest.RootResourceId
       PathPart: customer
 
+  APIGatewayCustomerPOSTMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub ${AWS::AccountId}
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref APIGatewayResourceCustomer
+      RestApiId: !Ref APIGatewayRest
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ["",["arn:aws:apigateway:",!Ref "AWS::Region", ":lambda:path/2015-03-31/functions/", !Ref LambdaFunctionArn,"/invocations"]]
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates: {"application/json":""}
+        RequestTemplates: {"application/json":""}
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayCustomerPUTMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub ${AWS::AccountId}
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: PUT
+      ResourceId: !Ref APIGatewayResourceCustomer
+      RestApiId: !Ref APIGatewayRest
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ["",["arn:aws:apigateway:",!Ref "AWS::Region", ":lambda:path/2015-03-31/functions/", !Ref LambdaFunctionArn,"/invocations"]]
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates: {"application/json":""}
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels: { "application/json": "Empty" }
+
   APIGatewayResourceCustomerKey:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -38,7 +79,7 @@ Resources:
       ParentId: !Ref APIGatewayResourceCustomer
       PathPart: "{key}"
 
-  APIGatewayCustomerKeyMethod:
+  APIGatewayCustomerKeyGetMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       OperationName: !Sub ${AWS::AccountId}
@@ -46,6 +87,53 @@ Resources:
       AuthorizationType: NONE
       HttpMethod: GET
       ResourceId: !Ref APIGatewayResourceCustomerKey
+      RestApiId: !Ref APIGatewayRest
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ["",["arn:aws:apigateway:",!Ref "AWS::Region", ":lambda:path/2015-03-31/functions/", !Ref LambdaFunctionArn,"/invocations"]]
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates: {"application/json":""}
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayCustomerKeyDeleteMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub ${AWS::AccountId}
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: DELETE
+      ResourceId: !Ref APIGatewayResourceCustomerKey
+      RestApiId: !Ref APIGatewayRest
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ["",["arn:aws:apigateway:",!Ref "AWS::Region", ":lambda:path/2015-03-31/functions/", !Ref LambdaFunctionArn,"/invocations"]]
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates: {"application/json":""}
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayResourceCustomerAll:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGatewayRest
+      ParentId: !Ref APIGatewayResourceCustomer
+      PathPart: "all"
+
+  APIGatewayCustomerAllGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub ${AWS::AccountId}
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      ResourceId: !Ref APIGatewayResourceCustomerAll
       RestApiId: !Ref APIGatewayRest
       Integration:
         Type: AWS_PROXY
@@ -70,7 +158,7 @@ Resources:
     Properties:
       RestApiId: !Ref APIGatewayRest
       Description: Lambda API Delployment
-    DependsOn: APIGatewayCustomerKeyMethod
+    DependsOn: APIGatewayCustomerKeyGetMethod
 
   APIGatewayStage:
     Type: AWS::ApiGateway::Stage
@@ -81,11 +169,47 @@ Resources:
       Description: API Gateway IST stage
     DependsOn: APIGatewayDeployment
 
-  APIGatewayRestPermission:
+  APIGatewayRestPermissionCustomerPost:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/POST/customer/"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn: APIGatewayRest
+
+  APIGatewayRestPermissionCustomerPut:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/PUT/customer/"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn: APIGatewayRest
+
+  APIGatewayRestPermissionCustomerKeyGet:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/*"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn: APIGatewayRest
+
+  APIGatewayRestPermissionCustomerKeyDelete:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/DELETE/customer/*"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn: APIGatewayRest
+
+  APIGatewayRestPermissionCustomerAllGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/all"
       FunctionName: !Ref LambdaFunctionArn
     DependsOn: APIGatewayRest

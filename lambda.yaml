@@ -99,6 +99,15 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: !GetAtt LambdaLogGroup.Arn
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:GetRecords
+              - dynamodb:Scan
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:PutItem
+            Resource: "*"
       Roles:
         - Ref: LambdaRole
 

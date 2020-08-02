@@ -47,10 +47,20 @@ Resources:
         IntegrationResponses:
           - StatusCode: 200
             ResponseTemplates: {"application/json":""}
-        RequestTemplates: {"application/json":""}
       MethodResponses:
         - StatusCode: 200
           ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayRestPermissionCustomerPost:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/POST/customer"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn:
+    - APIGatewayRest
+    - APIGatewayCustomerPOSTMethod
 
   APIGatewayCustomerPUTMethod:
     Type: AWS::ApiGateway::Method
@@ -71,6 +81,17 @@ Resources:
       MethodResponses:
         - StatusCode: 200
           ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayRestPermissionCustomerPut:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/PUT/customer"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn:
+    - APIGatewayRest
+    - APIGatewayCustomerPUTMethod
 
   APIGatewayResourceCustomerKey:
     Type: AWS::ApiGateway::Resource
@@ -99,6 +120,17 @@ Resources:
         - StatusCode: 200
           ResponseModels: { "application/json": "Empty" }
 
+  APIGatewayRestPermissionCustomerKeyGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/*"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn:
+    - APIGatewayRest
+    - APIGatewayCustomerKeyGetMethod
+
   APIGatewayCustomerKeyDeleteMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -118,6 +150,17 @@ Resources:
       MethodResponses:
         - StatusCode: 200
           ResponseModels: { "application/json": "Empty" }
+
+  APIGatewayRestPermissionCustomerKeyDelete:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/DELETE/customer/*"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn:
+    - APIGatewayRest
+    - APIGatewayCustomerKeyDeleteMethod
 
   APIGatewayResourceCustomerAll:
     Type: AWS::ApiGateway::Resource
@@ -146,6 +189,17 @@ Resources:
         - StatusCode: 200
           ResponseModels: { "application/json": "Empty" }
 
+  APIGatewayRestPermissionCustomerAllGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/all"
+      FunctionName: !Ref LambdaFunctionArn
+    DependsOn:
+    - APIGatewayRest
+    - APIGatewayCustomerAllGetMethod
+
   APIGatewayModel:
     Type: AWS::ApiGateway::Model
     Properties:
@@ -168,48 +222,3 @@ Resources:
       StageName: ist
       Description: API Gateway IST stage
     DependsOn: APIGatewayDeployment
-
-  APIGatewayRestPermissionCustomerPost:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/POST/customer/"
-      FunctionName: !Ref LambdaFunctionArn
-    DependsOn: APIGatewayRest
-
-  APIGatewayRestPermissionCustomerPut:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/PUT/customer/"
-      FunctionName: !Ref LambdaFunctionArn
-    DependsOn: APIGatewayRest
-
-  APIGatewayRestPermissionCustomerKeyGet:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/*"
-      FunctionName: !Ref LambdaFunctionArn
-    DependsOn: APIGatewayRest
-
-  APIGatewayRestPermissionCustomerKeyDelete:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/DELETE/customer/*"
-      FunctionName: !Ref LambdaFunctionArn
-    DependsOn: APIGatewayRest
-
-  APIGatewayRestPermissionCustomerAllGet:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGatewayRest}/*/GET/customer/all"
-      FunctionName: !Ref LambdaFunctionArn
-    DependsOn: APIGatewayRest

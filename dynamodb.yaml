@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to deploy DynamoDB through infrastructure as code.
+Parameters:
+
+  DynamoDBTableName:
+    Default: Customer
+    Description: Name of the DynamoDB table.
+    MinLength: 3
+    MaxLength: 255
+    Type: String
+
+Resources:
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "uuid"
+          AttributeType: "S"
+      BillingMode: PROVISIONED
+      KeySchema:
+        - AttributeName: "uuid"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: false
+      TableName: !Ref DynamoDBTableName
+
+Outputs:
+
+  DynamoDBCTableArn:
+    Description: DynamoDB table ARN.
+    Value: !GetAtt DynamoDBTable.Arn
+    Export:
+      Name: DynamoDBTableArn
+
+  DynamoDBTableName:
+    Description: DynamoDB table name.
+    Value: !Ref DynamoDBTable
+    Export:
+      Name: DynamoDBTableName

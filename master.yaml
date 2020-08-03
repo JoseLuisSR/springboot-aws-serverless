@@ -16,10 +16,22 @@ Metadata:
         Label:
           default: Nested Stack
         Parameters:
+          - TemplateURLDynamoDB
           - TemplateURLambda
           - TemplateURLApiGateway
+      -
+        Label:
+          default: DynamoDB table name.
+          Parameters:
+            - DynamoDBTableName
 
 Parameters:
+
+  TemplateURLDynamoDB:
+    Default: https://s3.amazonaws.com/mybucket/path/to/dynamodb.yml
+    Description: The DynamoDB stack template. Location of an object in Amazon S3.
+    Type: String
+
   TemplateURLambda:
     Default: https://s3.amazonaws.com/mybucket/path/to/lambda.yml
     Description: The lambda function stack template. Location of an object in Amazon S3.
@@ -28,6 +40,13 @@ Parameters:
   TemplateURLApiGateway:
     Default: https://s3.amazonaws.com/mybucket/path/to/apigateway.yml
     Description: The API Gateway stack template. Location of an object in Amazon S3.
+    Type: String
+
+  DynamoDBTableName:
+    Default: Customer
+    Description: Name of the DynamoDB table.
+    MinLength: 3
+    MaxLength: 255
     Type: String
 
   LambdaFunctionName:
@@ -78,6 +97,14 @@ Parameters:
     Type: String
 
 Resources:
+
+  dynamodb:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Ref TemplateURLDynamoDB
+      Parameters:
+        DynamoDBTableName: !Ref DynamoDBTableName
+
   lambda:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -88,6 +115,7 @@ Resources:
         LambdaRuntime: !Ref LambdaRuntime
         LambdaCodeS3Bucket: !Ref LambdaCodeS3Bucket
         LambdaCodeS3Key: !Ref LambdaCodeS3Key
+    DependsOn: dynamodb
 
   apigateway:
     Type: AWS::CloudFormation::Stack

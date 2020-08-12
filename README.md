@@ -3,61 +3,54 @@
 One of the outstanding cloud computing services is serverless where you don't worry about the infrastructure needing to deploy software components, you just focus on coding and developing the software.
 Serverless manage all administrative tasks to set up, provision and stay up to date the infrastructure and everything required to run and scale your application with high availability.
 
-In this article we will see how to create serverless web Java application with Spring Boot & aws-serverless-java-container library to run in AWS Lambda function, also we are going to use AWS Cloudformation 
-to deploy AWS Lambda function, AWS API Gateway, AWS DynamosDB and others services as infrastructure as code.
-
 ## Use Case
 
-For this article we are going to cover the use case to build and expose RESTful/JSON API over internet to clients can integrate with our Customer system. We will development the API with Java and Spring Boot, 
+In this article we are going to cover the use case to integration between 3rd party and our Customers system through RESTful/JSON API expose over internet. We will development the API with Java and Spring Boot, 
 run it in AWS Lambda function, integrate with AWS DynamoDB table to execute CRUD operations and expose API over internet using AWS API Gateway. The architecture overview is:
 
 ![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/serverless-aws.png?raw=true)
+
+Also we can use this architecture to handle Big Data use cases to ingest, process and store data at near real time. API Gateway can supports high volume of request per second, Lambda Function can auto scaling to process and convert high volume of data 
+and DynamoDB with low latency for Read and Write operations and auto scaling to store the data.
 
 You can enhancement this use case using [AWS Cognito](https://aws.amazon.com/cognito/) service to validate access token before consume the API and also use [AWS VPC](https://aws.amazon.com/vpc/) to deploy AWS services inside Virtual Private Cloud and control the access to resources.
 
 ## AWS Spring Boot
 
-[AWS](https://github.com/awslabs/aws-serverless-java-container/wiki/Quick-start---Spring-Boot) created a Java library to run Java application in AWS Lambda function, it handle the events 
-send by different kind of triggers like API Gateway to start the application and pass the events to RESTful/JSON end-points created with Spring Boot.
+![Screenshot](https://d2908q01vomqb2.cloudfront.net/ca3512f4dfa95a03169c5a670a4c91a19b3077b4/2018/02/28/serverless-java-container-process-1-1024x472.png)
 
-The first step to set up Spring Boot project to run in lambda function is add `serverless-java-container-springboot2` library through Gradle, you can also use Maven. For Spring Boot 2.0 version 
-and upwards you need use `serverless-java-container-springboot2` library instead of `serverless-java-container-springboot`.
+[AWS](https://github.com/awslabs) created [aws-serverless-java-container](https://github.com/awslabs/aws-serverless-java-container) serverless Java Container library acts as a proxy between the Lambda runtime and the Java Spring Boot application, translates incoming events from 
+API Gateway to request objects that Spring Boot can understand, and transforms responses from your application into a format that API Gateway understands. Also there is a library [com.amazonaws:aws-java-sdk-dynamodb](https://github.com/aws/aws-sdk-java-v2) to integration between Java 
+application and DynamoDB, find more details about how to use these libraries with Java application in this [repository](https://github.com/JoseLuisSR/springboot-aws-serverless/tree/master/Customer). 
 
-```
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compile 'com.amazonaws.serverless:aws-serverless-java-container-springboot2:[1.0,)'
-    ...
-}
-```
+You can create a quickly Spring Boot 2 application to run in AWS Lambda function through Maven archetype, and with others Java frameworks like Spring, Apache Struts, Jersey & Spark, got to [AWS Labs](https://github.com/awslabs/aws-serverless-java-container) for more details. 
 
-As second steps we need to create an handler class that implements `com.amazonaws.services.lambda.runtime.RequestStreamHandler` interface, define static variable `SpringBootLambdaContainerHandler` 
-and override the handleRequest method.  
+## Serverless
 
-```
-public class StreamLambdaHandler implements RequestStreamHandler {
+* Serverless applications / Function as a Service (FaaS)
 
-    private static SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
-    ...
+I thought serverless is fit to deploy microservices architecture but both are architectures and connect to them in different way, for microservices is common use HTTP API interface and serverless is all about events.
 
-    @Override
-    public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
-        handler.proxyStream(input, output, context);
-    }
-}
-```
+Both architectures are for separate the concerns of the application in many piece of software with high cohesion (single responsibility) and low coupling, so you can build a series of services that scale separately from each other to attend pikes of request and when some 
+service going dow don't impact the others.
 
-The AwsProxyRequest and AwsProxyResponse POJOs are default implementation of the request object from an API Gateway AWS_PROXY integration. These classes are using to get the HTTP Request and pass 
-from AWS_PROXY to RESTful/Json end-point and pass the HTTP response to AWS_PROXY.
+Serverless is an event driven architecture that response to events, in the other hand microservices response for API calls. The API expose by API Gateway is not the only mechanism to generate events, there are other triggers that can generate events and 
+[invoke lambda function](https://docs.aws.amazon.com/lambda/latest/dg/lambda-services.html#intro-core-components-event-sources) synchronous and asynchronous like S3, CloudFront, SNS, IoT and others. 
+
+I recommend [Serverless Best Practices](https://medium.com/@PaulDJohnston/serverless-best-practices-b3c97d551535) to know more about serverless applications. 
+
+* Serverless service
+
+When we talk about serverless service we meaning AWS services like DynamoDB and Lambda Function where AWS manage all administrative task to get high availability, auto scaling, replication and more. We are going to see these services in detail below.
 
 ## Cloudformation
 
-[Cloudformation](https://docs.aws.amazon.com/cloudformation/index.html) is AWS service to deploy infrastructure as a code. The goal is use the advantages of the code like control versions, standard & reusable piece of 
-code and automation with DevOps tools to create AWS services like Lambda function, DynamoDB a others dynamically. Cloudformation is integrate with all AWS services and it is free you only pay for the AWS services created and used.
+[Cloudformation](https://docs.aws.amazon.com/cloudformation/index.html) is AWS service to deploy infrastructure as a code. The goal is use the advantages of the code like control versions, standardize and reusable piece of 
+code and automation with DevOps tools to create AWS services like Lambda function, DynamoDB a others dynamically. Cloudformation is integrate with all AWS services and it is free you only pay for the AWS services used.
 
 ![Screenshot](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/create-stack-diagram.png)
 
-Cloudformation use stacks to control the steps and states to create AWS services using templates. The template is a JSON or YAML file that describes resources 
+Cloudformation stacks control the steps and states of create AWS services using templates. The template is a JSON or YAML file that describes resources 
 and properties necessary for each AWS services. You can create stack to deploy services in a single AWS account, or you can use Stack Set to deploy resources in multiple aws accounts. 
 
 We are going to use [Nested Stack](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-nested-stacks.html) to create AWS services using more 
@@ -69,7 +62,7 @@ stack as parameters to integration between AWS services.
 
 ![Screenshot](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/cfn-console-nested-stacks.png)
 
-In this repository you can find master stack (root) and API Gateway, Lambda function and DynamoDB stacks. Below mind map show the nested stack with DynamoDB, Lambda & API Gateway stacks:
+In this repository you can find master stack, API Gateway, Lambda function and DynamoDB stacks. Below the mind map shows you the relation between stacks.
 
 ![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/master-mind-map.jpg?raw=true)
 
@@ -112,9 +105,7 @@ Lambda function stack template has the code to deploy and execute Spring Boot ap
 
 ![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/lambda-function-mind-map.jpg?raw=true)
 
-The Spring Boot application expose RESTful/JSON end-points to perform CRUD operations over DynamoDB table, you can find the code and details in this repository.
-
-The AWS resources needed to create AWS Lambda Function and set up Spring Boot application are:
+The Spring Boot application expose RESTful/JSON end-points to perform CRUD operations over DynamoDB table, you can find the code and details in this [repository](https://github.com/JoseLuisSR/springboot-aws-serverless/tree/master/Customer).
 
 * [AWS::Lambda::Function](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html)
 * [AWS::IAM::Role](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html)
@@ -126,18 +117,18 @@ it is a precedence between these two stacks that we need to indicate in our mast
 
 ### DynamoDB
 
-DynamoDB is not relational database and it is serverless service where all administrative tasks to enable high availability, good performance and auto scaling are performed by AWS.
+[DynamoDB](https://aws.amazon.com/es/dynamodb/) is not relational database and it is serverless service where all administrative tasks to enable high availability, good performance and auto scaling are manage by AWS.
 
 The main components of DynamoDB are:
 
-* Table: Set of items.
-* Item: Set of attributes.
-* Attribute: Data of specific data type like String.
-* Partition key: Main key that define the partition to store the item and attributes. DynamoDB distribute the data in different partitions to store it. The partition can be in different availability zone of one regions 
+* **Table**: Set of items.
+* **Item**: Set of attributes.
+* **Attribute**: Data of a data type like String.
+* **Partition key**: Main key that define the partition to store the item and attributes. DynamoDB distribute the data in different partitions to store it. The partition can be in different availability zone of one regions 
 or different regions also. Is important that partition key has diversity of values to distribute the data in different partition.
-* Sort key: Key used sort the data stored in the partition. It is optional and can use together with partition key.
-* Local Secondary Index: Index over an attribute and partition key that improve the performance of the DynamoDB table to process query.request.
-* Global Secondary Index: Index over attributes different of partition key and store key to improve the performance of the DynamoDB table.
+* **Sort key**: Key used sort the data stored in the partition. It is optional and can use together with partition key.
+* **Local Secondary Index**: Index over an attribute and partition key that improve the performance of the DynamoDB table to process query request.
+* **Global Secondary Index**: Index over attributes different of partition key and store key to improve the performance of the DynamoDB table.
 
 In this article we are going to create DynamoDB table to store the data of Customer entity (uuid, name and age), use the uuid as partition key and name as sort key:
 
@@ -148,3 +139,11 @@ The DynamoDB stack template only has one resource and doesn't need more but you 
 * [AWS::DynamoDB::Table](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html)
 
 The stack use the DynamoDB table name and ARN as outputs, these values are important to set up IAM role with the policies to perform Read/Write operations over it table.
+
+## References
+
+* https://medium.com/@PaulDJohnston/serverless-and-microservices-a-match-made-in-heaven-9964f329a3bc
+
+* https://medium.com/@PaulDJohnston/serverless-best-practices-b3c97d551535
+
+* https://medium.com/@nuozhoux/get-started-guide-spring-boot-crud-with-dynamodb-991e6341844c

@@ -17,10 +17,14 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "uuid"
           AttributeType: "S"
+        - AttributeName: "name"
+          AttributeType: "S"
       BillingMode: PROVISIONED
       KeySchema:
         - AttributeName: "uuid"
           KeyType: "HASH"
+        - AttributeName: "name"
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5

@@ -19,6 +19,8 @@ You can enhancement this use case using [AWS Cognito](https://aws.amazon.com/cog
 
 ![Screenshot](https://d2908q01vomqb2.cloudfront.net/ca3512f4dfa95a03169c5a670a4c91a19b3077b4/2018/02/28/serverless-java-container-process-1-1024x472.png)
 
+ref: https://aws.amazon.com/es/blogs/opensource/java-apis-aws-lambda/
+
 [AWS](https://github.com/awslabs) created [aws-serverless-java-container](https://github.com/awslabs/aws-serverless-java-container) serverless Java Container library acts as a proxy between the Lambda runtime and the Java Spring Boot application, translates incoming events from 
 API Gateway to request objects that Spring Boot can understand, and transforms responses from your application into a format that API Gateway understands. Also there is a library [com.amazonaws:aws-java-sdk-dynamodb](https://github.com/aws/aws-sdk-java-v2) to integration between Java 
 application and DynamoDB, find more details about how to use these libraries with Java application in this [repository](https://github.com/JoseLuisSR/springboot-aws-serverless/tree/master/Customer). 
@@ -50,6 +52,8 @@ code and automation with DevOps tools to create AWS services like Lambda functio
 
 ![Screenshot](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/create-stack-diagram.png)
 
+ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-howdoesitwork.html
+
 Cloudformation stacks control the steps and states of create AWS services using templates. The template is a JSON or YAML file that describes resources 
 and properties necessary for each AWS services. You can create stack to deploy services in a single AWS account, or you can use Stack Set to deploy resources in multiple aws accounts. 
 
@@ -62,6 +66,8 @@ stack as parameters to integration between AWS services.
 
 ![Screenshot](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/cfn-console-nested-stacks.png)
 
+ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-nested-stacks.html
+
 In this repository you can find master stack, API Gateway, Lambda function and DynamoDB stacks. Below the mind map shows you the relation between stacks.
 
 ![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/master-mind-map.jpg?raw=true)
@@ -72,6 +78,8 @@ It is serverless service and is integration middleware between clients and AWS s
 services using JWT with oauth2.0, define limits like TPS, load balancing and monitoring the requests to services. 
 
 ![Screenshot](https://d1.awsstatic.com/serverless/New-API-GW-Diagram.c9fc9835d2a9aa00ef90d0ddc4c6402a2536de0d.png)
+
+ref: https://aws.amazon.com/api-gateway/
 
 [API Gateway](https://aws.amazon.com/api-gateway/?nc1=h_ls) can expose REST API, HTTP API and Web Sockets API and con integrate with Lambda Function, HTTP and AWS services like EC2, Kinesis and others.
 

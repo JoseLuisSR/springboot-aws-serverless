@@ -49,6 +49,10 @@ Parameters:
     Description: The deployment package for a Lambda function. Name of the object in Amazon S3.
     Type: String
 
+  LambdaDynamoDBTableARN:
+    Description: DynamoDB Table ARN to set up role with the polocies to perfom CRUD operations.
+    Type: String
+
 Resources:
 
   LambdaFunction:
@@ -107,7 +111,7 @@ Resources:
               - dynamodb:UpdateItem
               - dynamodb:DeleteItem
               - dynamodb:PutItem
-            Resource: "*"
+            Resource: !Ref LambdaDynamoDBTableARN
       Roles:
         - Ref: LambdaRole
 

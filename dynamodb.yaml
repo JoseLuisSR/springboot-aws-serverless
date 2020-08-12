@@ -30,7 +30,7 @@ Resources:
 
 Outputs:
 
-  DynamoDBCTableArn:
+  DynamoDBTableArn:
     Description: DynamoDB table ARN.
     Value: !GetAtt DynamoDBTable.Arn
     Export:

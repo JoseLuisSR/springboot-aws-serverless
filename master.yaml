@@ -115,6 +115,7 @@ Resources:
         LambdaRuntime: !Ref LambdaRuntime
         LambdaCodeS3Bucket: !Ref LambdaCodeS3Bucket
         LambdaCodeS3Key: !Ref LambdaCodeS3Key
+        LambdaDynamoDBTableARN: !GetAtt dynamodb.Outputs.DynamoDBTableArn
     DependsOn: dynamodb
 
   apigateway:

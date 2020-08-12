@@ -148,6 +148,38 @@ The DynamoDB stack template only has one resource and doesn't need more but you 
 
 The stack use the DynamoDB table name and ARN as outputs, these values are important to set up IAM role with the policies to perform Read/Write operations over it table.
 
+## Test
+
+The steps to create Nested Stack with Cloudformation are:
+
+1. Create a S3 bucket and upload all stacks templates (.yaml).
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/s3-bucket-stacks.png?raw=true)
+
+2. Upload `Customer-0.0.0.zip` file created with `gradle build` command to S3 bucket.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/s3-bucket-java-app.png?raw=true)
+
+3. Go to Cloudformation and create new stack. Put the S3 URL of `master.yaml` file.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/cloudformation-create-stack.png?raw=true)
+
+4. Add values to stacks parameters like bucket name where `Customer-0.0.0.zip` is present and S3 URL of `apigateway.yaml`, `lambda.yaml` and `dynamodb.yaml` files.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/cloudformation-stack-parameters.png?raw=true)
+
+5. Check Cloudformation stack events to see the state of creation of each resource.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/cloudformation-stack-events.png?raw=true)
+
+6. Go to API Gateway and validate the service was create and get the URL of each method to test over internet.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/apigateway-deploy.png?raw=true)
+
+7. Validate DynamoDB table were created and has items with attributes. Each time you call API Gateway RESTful/JSON API perform CRUD operation over DynamoDB table.
+
+![Screenshot](https://github.com/JoseLuisSR/springboot-aws-serverless/blob/master/doc/img/dynamodb-table-customer.png?raw=true)
+
 ## References
 
 * https://medium.com/@PaulDJohnston/serverless-and-microservices-a-match-made-in-heaven-9964f329a3bc

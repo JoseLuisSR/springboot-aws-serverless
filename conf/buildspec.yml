@@ -8,15 +8,15 @@ phases:
     commands:
       - cd Customer
       - echo Run test on `date`
-      - gradlew testClasses
+      - ./gradlew testClasses
   build:
     commands:
       - echo Build started on `date`
-      - gradlew build
+      - ./gradlew build
   post_build:
     commands:
       - echo Build completed on `date`
-      - graldew jar
+      - ./graldew jar
 artifacts:
   files:
     - build/distributions/Customer-0.0.1.zip

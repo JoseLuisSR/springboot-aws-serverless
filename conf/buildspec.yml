@@ -6,19 +6,17 @@ phases:
       java: openjdk8
   pre_build:
     commands:
-      - echo $CODEBUILD_SRC_DIR
       - cd Customer
-      - echo pwd
       - echo Run test on `date`
-      - gradle testClasses
+      - gradlew testClasses
   build:
     commands:
       - echo Build started on `date`
-      - gradle build
+      - gradlew build
   post_build:
     commands:
       - echo Build completed on `date`
-      - gralde jar
+      - graldew jar
 artifacts:
   files:
     - build/distributions/Customer-0.0.1.zip

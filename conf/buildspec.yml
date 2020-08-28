@@ -16,7 +16,7 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - ./graldew jar
+      - ./gradlew jar
 artifacts:
   files:
     - build/distributions/Customer-0.0.1.zip

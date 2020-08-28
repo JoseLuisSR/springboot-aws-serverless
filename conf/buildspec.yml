@@ -19,7 +19,7 @@ phases:
       - ./gradlew jar
 artifacts:
   files:
-    - build\distributions\Customer-0.0.1.zip
+    - Customer/build/distributions/Customer-0.0.1.zip
     - apigateway.yaml
     - lambda.yaml
     - dynamodb.yaml

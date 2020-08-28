@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+  pre_build:
+    commands:
+      - echo $CODEBUILD_SRC_DIR
+      - cd Customer
+      - echo pwd
+      - echo Run test on `date`
+      - gradle testClasses
+  build:
+    commands:
+      - echo Build started on `date`
+      - gradle build
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - gralde jar
+artifacts:
+  files:
+    - build/distributions/Customer-0.0.1.zip
+    - apigateway.yaml
+    - lambda.yaml
+    - dynamo.yaml
+    - master.yaml
+  discard-paths: yes
